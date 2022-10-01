@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+
+<!--==================SİTE BAŞLIĞI=================================================================-->
+
+    <title>OverWatch - Geleceğin Kuşağı</title>
+
+<!--==================HANGİ TARAYICIYA UYUMLULUĞU=================================================================-->
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+<!--==================TELEFON VE TABLET CİHAZLARA SİTE TASARIMI OTOMATİK BOYUTLANDIRMA=================================================================-->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!--==================SİTE TASARIM DOSYA YOLLARI=================================================================-->
+<link rel="stylesheet" href="style.css">
+
+<!--==================SİTENİN FAVİCON KISMI=================================================================-->
+
+    <link rel="shortcut icon" href="Over Watch Logo Projesi/favicon.png" type="image/x-icon">
+
+<!--==================SİTENİN BOOTSTRAP VE FONTAWESOME=================================================================-->
+
+<style>
+* {
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+
+
+body {
+    height: 90vh;
+    overflow: hidden
+}
+
+#main__main-container {
+    position: fixed;
+    height: 100%;    
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0px;
+    -ms-overflow-style: none;
+}
+
+#main__video {
+    position: relative;
+    overflow:scroll;
+    border-radius: 0px;
+}
+#main__video {
+    width: 100%;
+    height: 88%;
+    object-fit:cover;
+}
+
+#main__video-button {
+    background-color: red;
+    height: 70px;
+    width: 70px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 200px;
+    transition-property: box-shadow;
+    transition-duration: .3s;
+    font-size: 2em;
+}
+
+#main__video-button:hover {
+    cursor: pointer;
+    box-shadow: darkred 0 0 10px 10px;
+    transition-property: box-shadow;
+    transition-duration: .3s;
+}
+
+</style>
+
+</head>
+<body>
+<input type="file" accept="video/*"capture="user"/>
+   
+<div id="main__main-container" style="display:none;">
+
+<video id="main__video" playsinline autoplay loop controls ></video>
+<center style="margin-top:3%;">
+<div id="main__video-button">Record</div>
+</center>
+</div>
+
+<script>
+
+const videoButton = document.getElementById('main__video-button');
+const video = document.getElementById('main__video');
+
+let mediaRecorder;
+
+async function init() {
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+        })
+        startWebcam(stream);
+    } catch (err) {
+        console.log('Bir medya cihazı alınırken hata oluştu.');
+        console.log(err);
+    }
+}
+
+function startWebcam(stream) {
+    window.stream = stream;
+    video.srcObject = stream;
+}
+
+videoButton.onclick = () => {
+
+    switch (videoButton.textContent) {
+        case 'Record':
+            startRecording();
+            videoButton.textContent = 'Stop';
+            break;
+        case 'Stop':
+            videoButton.textContent = 'Record';
+            mediaRecorder.stop();
+            break;
+    }
+
+}
+
+function startRecording() {
+    if (video.srcObject === null) {
+        video.srcObject = window.stream;
+    }
+    mediaRecorder = new MediaRecorder(window.stream, {mimeType: 'video/webm;codecs=vp9,opus'});
+    mediaRecorder.start();
+    mediaRecorder.ondataavailable = recordVideo;
+}
+
+function recordVideo(event) {
+    if (event.data && event.data.size > 0) {
+        video.srcObject = null;
+        let videoUrl = URL.createObjectURL(event.data);
+        video.src = videoUrl;
+    }
+}
+
+function stopRecording() {
+    mediaRecorder.stop();
+}
+
+init();
+</script>
+</body>
+</html>
+  
